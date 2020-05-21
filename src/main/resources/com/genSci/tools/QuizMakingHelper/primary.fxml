@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.genSci.tools.QuizMakingHelper.PrimaryController">
+   <top>
+      <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <items>
+          <Button mnemonicParsing="false" text="Button" />
+            <Button mnemonicParsing="false" text="Button" />
+            <ChoiceBox prefWidth="150.0" />
+        </items>
+      </ToolBar>
+   </top>
+   <center>
+      <TextArea prefHeight="299.0" prefWidth="289.0" BorderPane.alignment="CENTER" />
+   </center>
+   <bottom>
+      <TextArea prefHeight="61.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
+   </bottom>
+   <right>
+      <TextArea prefHeight="160.0" prefWidth="299.0" BorderPane.alignment="CENTER" />
+   </right>
+</BorderPane>
