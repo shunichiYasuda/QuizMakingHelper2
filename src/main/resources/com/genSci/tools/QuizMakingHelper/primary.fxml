@@ -10,19 +10,20 @@
    <top>
       <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
         <items>
-          <Button mnemonicParsing="false" text="Button" />
-            <Button mnemonicParsing="false" text="Button" />
-            <ChoiceBox prefWidth="150.0" />
+          <Button mnemonicParsing="false" text="Open..." />
+            <Button mnemonicParsing="false" text="変換" />
+            <Button mnemonicParsing="false" text="Quit" />
+            <ChoiceBox fx:id="choice" prefWidth="150.0" />
         </items>
       </ToolBar>
    </top>
    <center>
-      <TextArea prefHeight="299.0" prefWidth="289.0" BorderPane.alignment="CENTER" />
+      <TextArea fx:id="srcArea" prefHeight="299.0" prefWidth="289.0" BorderPane.alignment="CENTER" />
    </center>
    <bottom>
-      <TextArea prefHeight="61.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
+      <TextArea fx:id="log" prefHeight="61.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
    </bottom>
    <right>
-      <TextArea prefHeight="160.0" prefWidth="299.0" BorderPane.alignment="CENTER" />
+      <TextArea fx:id="codeArea" prefHeight="160.0" prefWidth="299.0" BorderPane.alignment="CENTER" />
    </right>
 </BorderPane>
