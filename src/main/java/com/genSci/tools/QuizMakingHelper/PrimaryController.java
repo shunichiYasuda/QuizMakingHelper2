@@ -36,8 +36,6 @@ public class PrimaryController {
 
 	@FXML
 	private void execAction() {
-		// srcArea から文字列を読み込む。
-
 		// choice ボックス値で処理を分ける。
 		String selected = choice.getValue();
 		if (selected == null)
@@ -64,6 +62,7 @@ public class PrimaryController {
 		// <Q> </Q> で問題ごとに区切られていることを前提
 		String doc = srcArea.getText();
 		doc = doc.replaceAll("\n", "");
+		doc = doc.replaceAll("\t", "");
 		//codeArea.appendText(doc);
 		List<String> quizList = new ArrayList<String>();
 		String regex = "<Q>(.+?)</Q>";
