@@ -3,29 +3,55 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.genSci.tools.QuizMakingHelper.PrimaryController">
    <top>
       <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
         <items>
-          <Button mnemonicParsing="false" text="Open..." />
-            <Button mnemonicParsing="false" onAction="#execAction" text="変換" />
-            <Button mnemonicParsing="false" onAction="#quitAction" text="Quit" />
             <Label text="出力形式：" />
-            <ChoiceBox fx:id="choice" prefWidth="150.0" />
+            <ChoiceBox fx:id="choice" prefHeight="25.0" prefWidth="292.0" />
+            <Button mnemonicParsing="false" onAction="#quitAction" text="Quit" />
         </items>
       </ToolBar>
    </top>
-   <center>
-      <TextArea fx:id="srcArea" prefHeight="299.0" prefWidth="289.0" BorderPane.alignment="CENTER" />
-   </center>
    <bottom>
       <TextArea fx:id="log" prefHeight="61.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
    </bottom>
-   <right>
-      <TextArea fx:id="codeArea" prefHeight="160.0" prefWidth="299.0" BorderPane.alignment="CENTER" />
-   </right>
+   <center>
+      <SplitPane dividerPositions="0.4983277591973244" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+               <children>
+                  <ToolBar prefHeight="40.0" prefWidth="298.0">
+                    <items>
+                        <Label text="ソース入力" />
+                      <Button mnemonicParsing="false" onAction="#openAction" text="Open..." />
+                      <Button mnemonicParsing="false" onAction="#clearSrcArea" text="Clear" />
+                        <Button mnemonicParsing="false" onAction="#saveAction" text="Save..." />
+                        <Button mnemonicParsing="false" onAction="#execAction" text="変換" />
+                    </items>
+                  </ToolBar>
+                  <TextArea fx:id="srcArea" layoutX="2.0" layoutY="40.0" prefHeight="254.0" prefWidth="294.0" />
+               </children>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+               <children>
+                  <ToolBar prefHeight="40.0" prefWidth="299.0">
+                    <items>
+                        <Label text="出力コード" />
+                        <Button mnemonicParsing="false" onAction="#copyToClipboad" text="Copy" />
+                      <Button mnemonicParsing="false" onAction="#clearCodeArea" text="Clear" />
+                    </items>
+                  </ToolBar>
+                  <TextArea fx:id="codeArea" layoutX="1.0" layoutY="40.0" prefHeight="258.0" prefWidth="296.0" />
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </center>
 </BorderPane>
