@@ -255,9 +255,6 @@ public class PrimaryController {
 				// System.out.println("----小問題終わり---");
 				// codeArea.appendText("----小問題終わり---\n");
 			} // end of while(m..小問題ごとの処理
-				// System.out.println("多肢選択問題の固まり");
-				// codeArea.appendText("多肢選択問題の固まり\n");
-				//
 			codeArea.appendText(target + "\n");
 		}
 	}
