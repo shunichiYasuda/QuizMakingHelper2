@@ -31,13 +31,12 @@ import javafx.stage.FileChooser;
 public class PrimaryController {
 	String encode = null;
 	String sysEncode = null;
-	String[] itemArray = { "Tex", "Moodle 穴埋め:多肢選択", "Moodle 穴埋め:数値入力（数値選択）" };
+	String[] itemArray = { "Moodle 穴埋め:多肢選択", "Moodle 穴埋め:数値入力（数値選択）" };
 	ObservableList<String> availableChoices = FXCollections.observableArrayList(itemArray);
 	List<String> questionList = new ArrayList<String>();
 	@FXML
 	TextArea srcArea;
-	@FXML
-	TextArea log;
+	
 	@FXML
 	TextArea codeArea;
 	@FXML
@@ -129,6 +128,7 @@ public class PrimaryController {
 	@FXML
 	private void initialize() {
 		choice.setItems(availableChoices);
+		choice.setValue(availableChoices.get(0));
 	}
 
 	@FXML
@@ -142,25 +142,19 @@ public class PrimaryController {
 		String selected = choice.getValue();
 		if (selected == null)
 			return;
+		
 		if (selected.equals(itemArray[0])) {
-			translateToTeX();
-		}
-		if (selected.equals(itemArray[1])) {
 			translateToMulti();
 		}
-		if (selected.equals(itemArray[2])) {
+		if (selected.equals(itemArray[1])) {
 			translateToNum();
 		}
 	}
 
 	//
-	private void translateToTeX() {
-		log.appendText("in Tex\n");
-		// codeArea.setText(questionList.get(0));
-	}
+	
 
 	private void translateToMulti() {
-		log.appendText("in Multi\n");
 		// <Q> </Q> で問題ごとに区切られていることを前提
 		String doc = srcArea.getText();
 		doc = doc.replaceAll("\n", "");
@@ -260,7 +254,6 @@ public class PrimaryController {
 	}
 
 	private void translateToNum() {
-		log.appendText("in Num\n");
 		// <Q> </Q> で問題ごとに区切られていることを前提
 				String doc = srcArea.getText();
 				doc = doc.replaceAll("\n", "");

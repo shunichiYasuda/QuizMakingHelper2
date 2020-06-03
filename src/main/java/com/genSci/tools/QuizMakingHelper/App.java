@@ -21,7 +21,7 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
     	BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("primary.fxml"));
     	scene = new Scene(root);
-    	stage.setTitle("Moodle・TeX テスト作成支援 ver.0.9b");
+    	stage.setTitle("Moodle穴埋め問題作成支援 ver.1.0");
         stage.setScene(scene);
         stage.show();
     }
