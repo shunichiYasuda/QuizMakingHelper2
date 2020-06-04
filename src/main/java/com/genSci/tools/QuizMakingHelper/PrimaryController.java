@@ -31,12 +31,13 @@ import javafx.stage.FileChooser;
 public class PrimaryController {
 	String encode = null;
 	String sysEncode = null;
-	String[] itemArray = { "Moodle 穴埋め:多肢選択", "Moodle 穴埋め:数値入力（数値選択）" };
+	String[] itemArray = { "Moodle 穴埋め:多肢選択", "Moodle 穴埋め:単純な数値入力", "Moodle 穴埋め：数値選択" };
 	ObservableList<String> availableChoices = FXCollections.observableArrayList(itemArray);
 	List<String> questionList = new ArrayList<String>();
+	String path = "";
 	@FXML
 	TextArea srcArea;
-	
+
 	@FXML
 	TextArea codeArea;
 	@FXML
@@ -58,11 +59,16 @@ public class PrimaryController {
 		sysEncode = System.getProperty("file.encoding");
 		FileChooser fc = new FileChooser();
 		fc.setTitle("Set save file");
-		fc.setInitialDirectory(new File("."));
+		if (path == "") {
+			fc.setInitialDirectory(new File("."));
+		} else {
+			fc.setInitialDirectory(new File(path));
+		}
 		File file = fc.showSaveDialog(null);
 		if (file == null) {
 			return;
 		}
+		path = file.getParent();
 		if (encode.equals(null)) {
 			encode = sysEncode;
 		}
@@ -84,11 +90,18 @@ public class PrimaryController {
 		sysEncode = System.getProperty("file.encoding");
 		FileChooser fc = new FileChooser();
 		fc.setTitle("Open data file");
-		fc.setInitialDirectory(new File("."));
+		if (path == "") {
+			fc.setInitialDirectory(new File("."));
+		} else {
+			fc.setInitialDirectory(new File(path));
+		}
 		File file = fc.showOpenDialog(null);
 		if (file == null) {
 			return;
 		}
+		// ファイルのパス
+		path = file.getParent();
+		//System.out.println("path="+path);
 		// 文字コード判別
 		try {
 			encode = detectEncoding(file);
@@ -142,17 +155,52 @@ public class PrimaryController {
 		String selected = choice.getValue();
 		if (selected == null)
 			return;
-		
+
 		if (selected.equals(itemArray[0])) {
 			translateToMulti();
 		}
 		if (selected.equals(itemArray[1])) {
+			translateToSimpleMulti();
+		}
+		if (selected.equals(itemArray[2])) {
 			translateToNum();
 		}
 	}
 
 	//
-	
+	private void translateToSimpleMulti() {
+		// <Q> </Q> で問題ごとに区切られていることを前提
+		String doc = srcArea.getText();
+		doc = doc.replaceAll("\n", "");
+		doc = doc.replaceAll("\t", "");
+		//System.out.println("in simple");
+		// codeArea.appendText(doc);
+		List<String> quizList = new ArrayList<String>();
+		String regex = "<Q>(.+?)</Q>";
+		// regex = "(.+?)<s:.+?>";
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(doc);
+		while (m.find()) {
+			String str = m.group();
+			str = str.replace("<Q>", "<p>");
+			str = str.replace("</Q>", "</p>");
+			quizList.add(str);
+		}
+		for (String target : quizList) {
+			//System.out.println("問題：" + target);
+			// 単純数値問題<qn:...> を置き換える。
+			p = Pattern.compile("<qn:(.+?)>");
+			m = p.matcher(target);
+			while (m.find()) {
+				String str = m.group();
+				// System.out.println(str);
+				String newStr = "{1:NM:=" + m.group(1) + "}";
+				target = target.replace(str, newStr);
+			}
+			// System.out.println("qn変換後：" + target);
+			codeArea.appendText(target + "\n");
+		}
+	}
 
 	private void translateToMulti() {
 		// <Q> </Q> で問題ごとに区切られていることを前提
@@ -178,7 +226,7 @@ public class PrimaryController {
 		// <p></p>で囲まれた問題ごとに処理する。
 		// 多肢選択問題の場合
 		for (String target : quizList) {
-			//System.out.println("問題：" + target);
+			// System.out.println("問題：" + target);
 			// codeArea.appendText("問題："+target+"\n");
 			// <s:....>までの <q: ...>を処理したい
 			regex = "(.+?)<s:.+?>";
@@ -188,7 +236,7 @@ public class PrimaryController {
 			while (m.find()) {
 				String str = m.group();
 				// str は<s:...>までの文字列
-				//System.out.println("最初のstr:" + str);
+				// System.out.println("最初のstr:" + str);
 				String originalStr = new String(str);
 				// いったん<s:....>を抜き出す。
 				Pattern p_s = Pattern.compile("<s:.+?>");
@@ -231,19 +279,19 @@ public class PrimaryController {
 						// check
 						// System.out.println(moodleStr);
 					String newStr = "{1:MC:" + moodleStr + "}";
-					//System.out.println("q_str:" + q_str);
-					//System.out.println("q置き換え前str:" + str);
+					// System.out.println("q_str:" + q_str);
+					// System.out.println("q置き換え前str:" + str);
 					// 問題全体で<q:..> を置き換える
 					str = str.replace(q_str, newStr);
 				} // end of while(m2...
-				//System.out.println("消去前：" + str);
+					// System.out.println("消去前：" + str);
 
 				// codeArea.appendText("消去前："+str+"\n");
 				// 小問題末尾の<s:...>を消す
 				str = str.replace(selectItems, "");
-				//System.out.println("消去後str:" + str);
+				// System.out.println("消去後str:" + str);
 				target = target.replace(originalStr, str);
-				//System.out.println("置き換え後target:" + target);
+				// System.out.println("置き換え後target:" + target);
 
 				// codeArea.appendText(str+"\n");
 				// System.out.println("----小問題終わり---");
@@ -255,118 +303,107 @@ public class PrimaryController {
 
 	private void translateToNum() {
 		// <Q> </Q> で問題ごとに区切られていることを前提
-				String doc = srcArea.getText();
-				doc = doc.replaceAll("\n", "");
-				doc = doc.replaceAll("\t", "");
-				// codeArea.appendText(doc);
-				List<String> quizList = new ArrayList<String>();
-				String regex = "<Q>(.+?)</Q>";
-				// regex = "(.+?)<s:.+?>";
-				Pattern p = Pattern.compile(regex);
-				Matcher m = p.matcher(doc);
-				while (m.find()) {
-					String str = m.group();
-					str = str.replace("<Q>", "<p>");
-					str = str.replace("</Q>", "</p>");
-					quizList.add(str);
+		String doc = srcArea.getText();
+		doc = doc.replaceAll("\n", "");
+		doc = doc.replaceAll("\t", "");
+		// codeArea.appendText(doc);
+		List<String> quizList = new ArrayList<String>();
+		String regex = "<Q>(.+?)</Q>";
+		// regex = "(.+?)<s:.+?>";
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(doc);
+		while (m.find()) {
+			String str = m.group();
+			str = str.replace("<Q>", "<p>");
+			str = str.replace("</Q>", "</p>\n");
+			quizList.add(str);
+		}
+		// <p></p>で囲まれた問題ごとに処理する。
+		for (String target : quizList) {
+			// <s:...> までの小問に分割する
+			// <s:....>までの <q: ...>を処理したい
+			regex = "(.+?)<s:.+?>";
+			p = Pattern.compile(regex);
+			m = p.matcher(target);
+			String selectItems = null;
+			String[] selectItemArray = null;
+			// 数値問題入力において<s:...>が存在したら、それは「選択肢から番号を選んで入力」を意味する。
+			// そのときは<table>をつくるのでフラグが必要
+			boolean tableFlag = false;
+			while (m.find()) { // <s:...>で終わる小問ごとの処理
+				// ここへ来たと言うことは<s:...>があったということ
+				tableFlag = true;
+				String str = m.group();
+				// str は<s:...>までの文字列
+				// System.out.println("最初のstr:" + str);
+				String originalStr = new String(str);
+				// いったん<s:....>を抜き出す。
+				Pattern p_s = Pattern.compile("<s:(.+?)>");
+				Matcher m_s = p_s.matcher(str);
+				while (m_s.find()) {
+					selectItems = m_s.group(1);
+					// System.out.println("selectItems:"+selectItems);
+					selectItemArray = selectItems.split(",");
+					// codeArea.appendText("selectitems:"+selectItems+"\n");
+					String oldStr = m_s.group();
+					str = str.replace(oldStr, "");
 				}
-				// <p></p>で囲まれた問題ごとに処理する。
-				// 数値問題の場合
-				for (String target : quizList) {
-					//System.out.println("問題：" + target);
-					// 単純数値問題<qn:...> を置き換える。
-					p = Pattern.compile("<qn:(.+?)>");
-					m = p.matcher(target);
-					while (m.find()) {
-						String str = m.group();
-						// System.out.println(str);
-						String newStr = "{1:NM:=" + m.group(1) + "}";
-						target = target.replace(str, newStr);
+				// 確認
+//						for (String s : selectItemArray) {
+//							System.out.println(s);
+//						}
+				// System.out.println("消去後:" + str);
+				// selectItemArray をシャッフル
+				List<String> tmpList = new ArrayList<String>(Arrays.asList(selectItemArray));
+				Collections.shuffle(tmpList);
+				selectItemArray = tmpList.toArray(new String[tmpList.size()]);
+//						for (String s : selectItemArray) {
+//							System.out.println(s);
+//						}
+				// <q:...>の処理
+				String regex2 = "<q:(.+?)>";
+				Pattern p2 = Pattern.compile(regex2);
+				Matcher m2 = p2.matcher(str);
+				while (m2.find()) {
+					String oldStr = m2.group();
+					String ans = m2.group(1);
+					int index = 0;
+					for (int i = 0; i < selectItemArray.length; i++) {
+						if (ans.equals(selectItemArray[i]))
+							index = (i + 1);
 					}
-					// System.out.println("変換後：" + target);
-					// <s:...> までの小問に分割する
-					// <s:....>までの <q: ...>を処理したい
-					regex = "(.+?)<s:.+?>";
-					p = Pattern.compile(regex);
-					m = p.matcher(target);
-					String selectItems = null;
-					String[] selectItemArray = null;
-					// 数値問題入力において<s:...>が存在したら、それは「選択肢から番号を選んで入力」を意味する。
-					// そのときは<table>をつくるのでフラグが必要
-					boolean tableFlag = false;
-					while (m.find()) { // <s:...>で終わる小問ごとの処理
-						// ここへ来たと言うことは<s:...>があったということ
-						tableFlag = true;
-						String str = m.group();
-						// str は<s:...>までの文字列
-						// System.out.println("最初のstr:" + str);
-						String originalStr = new String(str);
-						// いったん<s:....>を抜き出す。
-						Pattern p_s = Pattern.compile("<s:(.+?)>");
-						Matcher m_s = p_s.matcher(str);
-						while (m_s.find()) {
-							selectItems = m_s.group(1);
-							// System.out.println("selectItems:"+selectItems);
-							selectItemArray = selectItems.split(",");
-							// codeArea.appendText("selectitems:"+selectItems+"\n");
-							String oldStr = m_s.group();
-							str = str.replace(oldStr, "");
-						}
-						// 確認
-//						for (String s : selectItemArray) {
-//							System.out.println(s);
-//						}
-						// System.out.println("消去後:" + str);
-						// selectItemArray をシャッフル
-						List<String> tmpList = new ArrayList<String>(Arrays.asList(selectItemArray));
-						Collections.shuffle(tmpList);
-						selectItemArray = tmpList.toArray(new String[tmpList.size()]);
-//						for (String s : selectItemArray) {
-//							System.out.println(s);
-//						}
-						// <q:...>の処理
-						String regex2 = "<q:(.+?)>";
-						Pattern p2 = Pattern.compile(regex2);
-						Matcher m2 = p2.matcher(str);
-						while (m2.find()) {
-							String oldStr = m2.group();
-							String ans = m2.group(1);
-							int index = 0;
-							for (int i = 0; i < selectItemArray.length; i++) {
-								if (ans.equals(selectItemArray[i]))
-									index = (i + 1);
-							}
-							String newStr = "{1:NM:=" + index + "}";
-							str = str.replace(oldStr, newStr);
-						}
-						//System.out.println("変換後:" + str);
-						target = target.replace(originalStr, str);
-						//System.out.println("target: " + target);
-						codeArea.appendText(target);
-					} // end of while(m.find()) :小問ごとの処理
-					//<s:....>を<table>にする。
-					if(tableFlag) {
-						String tableStr = "<table>\n<caption><b>選択肢</b></caption>\n";
-						//選択肢の数
-						int num = selectItemArray.length;
-						int index = 0;
-						tableStr +=("<tr>");
-						while(index < num) {
-							tableStr +="<td>"+(index+1)+". "+selectItemArray[index]+"</td>";
-							if(((index+1)%5) == 0 ) {
-								tableStr +=("</tr>\n");
-								tableStr += ("<tr>");
-							}
-							if(index == num-1) {
-								tableStr+=("</tr>\n");
-							}
-							index++;
-						}
-						tableStr += ("</table>\n");
-						//System.out.println(tableStr);
-						codeArea.appendText(tableStr);
-					}// end of if(tableFlag : <table>作成処理
-				} // end of for( target : 問題ごとの処理
+					String newStr = "{1:NM:=" + index + "}";
+					str = str.replace(oldStr, newStr);
+				}
+				// System.out.println("変換後:" + str);
+				target = target.replace(originalStr, str);
+				//System.out.println("q: 変換後: " + target);
+				//codeArea.appendText(target);
+			} // end of while(m.find()) :小問ごとの処理
+			codeArea.appendText(target);
+			// <s:....>を<table>にする。
+			if (tableFlag) {
+				String tableStr = "<table>\n<caption><b>選択肢</b></caption>\n";
+				// 選択肢の数
+				int num = selectItemArray.length;
+				int index = 0;
+				tableStr += ("<tr>");
+				while (index < num) {
+					tableStr += "<td>" + (index + 1) + ". " + selectItemArray[index] + "</td>";
+					if (((index + 1) % 5) == 0) {
+						tableStr += ("</tr>\n");
+						tableStr += ("<tr>");
+					}
+					if (index == num - 1) {
+						tableStr += ("</tr>\n");
+					}
+					index++;
+				}
+				tableStr += ("</table>\n");
+				// System.out.println(tableStr);
+				codeArea.appendText(tableStr);
+			} // end of if(tableFlag : <table>作成処理
+		} // end of for( target : 問題ごとの処理
 	}
 
 	//
