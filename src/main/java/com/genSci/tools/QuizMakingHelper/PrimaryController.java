@@ -31,7 +31,7 @@ import javafx.stage.FileChooser;
 public class PrimaryController {
 	String encode = null;
 	String sysEncode = null;
-	String[] itemArray = { "Moodle 穴埋め:多肢選択", "Moodle 穴埋め:単純な数値入力", "Moodle 穴埋め：数値選択" };
+	String[] itemArray = { "Moodle 穴埋め:多肢選択", "Moodle 穴埋め:単純な数値入力", "Moodle 穴埋め：数値選択", "Moodle穴埋め：表の空欄" };
 	ObservableList<String> availableChoices = FXCollections.observableArrayList(itemArray);
 	List<String> questionList = new ArrayList<String>();
 	String path = "";
@@ -101,7 +101,7 @@ public class PrimaryController {
 		}
 		// ファイルのパス
 		path = file.getParent();
-		//System.out.println("path="+path);
+		// System.out.println("path="+path);
 		// 文字コード判別
 		try {
 			encode = detectEncoding(file);
@@ -165,6 +165,66 @@ public class PrimaryController {
 		if (selected.equals(itemArray[2])) {
 			translateToNum();
 		}
+		if (selected.equals(itemArray[3])) {
+			tableToNum();
+			//System.out.println("3 : selected.");
+		}
+	}
+
+	private void tableToNum() {
+		// <Q> </Q> で問題ごとに区切られていることを前提
+		//System.out.println("in tableToNum()");
+		String doc = srcArea.getText();
+		//1行ごとの変換処理
+		String[] line = doc.split("\n");
+		doc = "";
+		for(String r:line) {
+			r = r.trim();
+			if(!(r.contentEquals("<Q>")|| r.contentEquals("</Q>"))) {
+				String[] contents = r.split("\t");
+				for(String c:contents) {//qからはじまるものを<qn:に変換
+					//System.out.println("contents="+c);
+					String newStr = "";
+					if(c.startsWith("q")) {
+						newStr =c.replace("q", "<qn:");
+						newStr = newStr +">";
+						r=r.replace(c,newStr);
+					}
+				}
+				r="<tr><td>"+r;
+				r=r.replace("\t", "</td><td>");
+				r=r+"</td></tr>";
+			}
+			//System.out.println(r);
+			doc = doc+r;
+		}
+		//System.out.println(doc);
+		
+		List<String> quizList = new ArrayList<String>();
+		String regex = "<Q>(.+?)</Q>";
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(doc);
+		while (m.find()) {
+			String str = m.group();
+			str = str.replace("<Q>", "<p><table>");
+			str = str.replace("</Q>", "</table></p>");
+			quizList.add(str);
+		}
+		for (String target : quizList) {
+			// System.out.println("問題：" + target);
+			// 単純数値問題<qn:...> を置き換える。
+			p = Pattern.compile("<qn:(.+?)>");
+			m = p.matcher(target);
+			while (m.find()) {
+				String str = m.group();
+				//System.out.println(str);
+				//String newStr = "{1:NM:=" + m.group(1) + "}";
+				String newStr = "{1:SA:=" + m.group(1) + "}";
+				target = target.replace(str, newStr);
+			}
+			//System.out.println("qn変換後：" + target);
+			codeArea.appendText(target + "\n");
+		}
 	}
 
 	//
@@ -173,7 +233,7 @@ public class PrimaryController {
 		String doc = srcArea.getText();
 		doc = doc.replaceAll("\n", "");
 		doc = doc.replaceAll("\t", "");
-		//System.out.println("in simple");
+		// System.out.println("in simple");
 		// codeArea.appendText(doc);
 		List<String> quizList = new ArrayList<String>();
 		String regex = "<Q>(.+?)</Q>";
@@ -187,7 +247,7 @@ public class PrimaryController {
 			quizList.add(str);
 		}
 		for (String target : quizList) {
-			//System.out.println("問題：" + target);
+			// System.out.println("問題：" + target);
 			// 単純数値問題<qn:...> を置き換える。
 			p = Pattern.compile("<qn:(.+?)>");
 			m = p.matcher(target);
@@ -377,8 +437,8 @@ public class PrimaryController {
 				}
 				// System.out.println("変換後:" + str);
 				target = target.replace(originalStr, str);
-				//System.out.println("q: 変換後: " + target);
-				//codeArea.appendText(target);
+				// System.out.println("q: 変換後: " + target);
+				// codeArea.appendText(target);
 			} // end of while(m.find()) :小問ごとの処理
 			codeArea.appendText(target);
 			// <s:....>を<table>にする。
