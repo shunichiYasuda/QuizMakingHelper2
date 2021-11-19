@@ -31,7 +31,7 @@ import javafx.stage.FileChooser;
 public class PrimaryController {
 	String encode = null;
 	String sysEncode = null;
-	String[] itemArray = { "Moodle 穴埋め:多肢選択", "Moodle 穴埋め:単純な数値入力", "Moodle 穴埋め：数値選択", "Moodle穴埋め：表の空欄" };
+	String[] itemArray = { "Moodle 穴埋め:多肢選択", "Moodle 穴埋め:単純な数値入力", "Moodle 穴埋め： 番号選択", "Moodle穴埋め：表の空欄" };
 	ObservableList<String> availableChoices = FXCollections.observableArrayList(itemArray);
 	List<String> questionList = new ArrayList<String>();
 	String path = "";
