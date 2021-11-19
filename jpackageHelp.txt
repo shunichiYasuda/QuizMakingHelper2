@@ -1,0 +1,190 @@
+使用方法: jpackage <options>
+
+使用例:
+--------------
+    ホスト・システムに適したアプリケーション・パッケージを生成します。
+        モジュラ・アプリケーションの場合:
+            jpackage -n name -p modulePath -m moduleName/className
+        非モジュラ・アプリケーションの場合:
+            jpackage -i inputDir -n name \
+                --main-class className --main-jar myJar.jar
+        事前作成されたアプリケーション・イメージから:
+            jpackage -n name --app-image appImageDir
+    アプリケーション・イメージの生成:
+        モジュラ・アプリケーションの場合:
+            jpackage --type app-image -n name -p modulePath \
+                -m moduleName/className
+        非モジュラ・アプリケーションの場合:
+            jpackage --type app-image -i inputDir -n name \
+                --main-class className --main-jar myJar.jar
+        jlinkに独自のオプションを指定するには、jlinkを別個に実行します。
+            jlink --output appRuntimeImage -p modulePath -m moduleName \
+                --no-header-files [<additional jlink options>...]
+            jpackage --type app-image -n name \
+                -m moduleName/className --runtime-image appRuntimeImage
+    Javaランタイム・パッケージを生成します。
+        jpackage -n name --runtime-image <runtime-image>
+
+一般的なオプション:
+  @<filename> 
+          ファイルからの読取りオプションおよびモード 
+          このオプションは複数回使用できます。
+  --type -t <type> 
+          作成するパッケージのタイプ
+          有効な値: {"app-image", "dmg", "pkg"} 
+          このオプションが指定されていない場合、プラットフォーム依存の
+          デフォルト・タイプが作成されます
+  --app-version <version>
+          アプリケーションおよびパッケージのバージョン
+  --copyright <copyright string>
+          アプリケーションのコピーライト
+  --description <description string>
+          アプリケーションの説明
+  --help -h 
+          使用方法テキストと現在のプラットフォームの有効なオプションのリストと説明を
+          出力ストリームに出力して、終了します
+  --name -n <name>
+          アプリケーションおよびパッケージの名前
+  --dest -d <destination path>
+          生成された出力ファイルが配置されるパス
+          デフォルトは現在の作業ディレクトリです。
+          (絶対パスまたは現在のディレクトリからの相対パス)
+  --temp <file path>
+          一時ファイルの作成に使用される新規または空のディレクトリのパス
+          (絶対パスまたは現在のディレクトリからの相対パス)
+          指定した場合、タスク完了時に一時ディレクトリは削除されないため
+          手動で削除する必要があります
+          指定しなかった場合、一時ディレクトリが作成され
+          タスク完了時に削除されます。
+  --vendor <vendor string>
+          アプリケーションのベンダー
+  --verbose
+          詳細な出力を有効にします
+  --version
+          製品バージョンを出力ストリームに出力して終了します
+
+ランタイム・イメージを作成するためのオプション:
+  --add-modules <module name>[,<module name>...]
+          追加するモジュールのカンマ(",")区切りリスト。
+          このモジュール・リストとメイン・モジュール(指定した場合)
+          が--add-module引数としてjlinkに渡されます。
+          指定しなかった場合、メイン・モジュールのみ(--moduleが
+          指定された場合)、またはデフォルトのモジュール・セット(--main-jarが 
+          指定された場合)が使用されます。
+          このオプションは複数回使用できます。
+  --module-path -p <module path>...
+          パスの:区切りリスト
+          各パスは、モジュールのディレクトリまたは
+          モジュラjarへのパスです。
+          (各パスは、絶対パスまたは現在のディレクトリからの相対パスです)
+          このオプションは複数回使用できます。
+  --bind-services 
+          --bind-servicesオプションをjlink ( 
+          サービス・プロバイダ・モジュールとその依存性内でリンクします)に渡します 
+  --runtime-image <file path>
+          アプリケーション・イメージにコピーされる、事前定義済みのランタイム・イメージ
+          のパス
+          (絶対パスまたは現在のディレクトリからの相対パス)
+          --runtime-imageが指定されていない場合、jpackageはjlinkを実行し、
+          次のオプションを使用してランタイム・イメージを作成します:
+          --strip-debug、--no-header-files、--no-man-pagesおよび
+          --strip-native-コマンド。
+
+アプリケーション・イメージを作成するためのオプション:
+  --icon <icon file path>
+          アプリケーション・パッケージのアイコンのパス
+          (絶対パスまたは現在のディレクトリからの相対パス)
+  --input -i <input path>
+          パッケージ化するファイルを含む入力ディレクトリへのパス
+          (絶対パスまたは現在のディレクトリからの相対パス)
+          入力ディレクトリのすべてのファイルは、アプリケーション・イメージに
+          パッケージ化されます。
+
+アプリケーション・ランチャを作成するためのオプション:
+  --add-launcher <launcher name>=<file path>
+          ランチャの名前、およびキー、値のペアのリスト
+          を含むプロパティ・ファイルへのパス
+          (絶対パスまたは現在のディレクトリからの相対パス)
+          キー"module"、"main-jar"、"main-class"、
+          "arguments"、"java-options"、"app-version"、"icon"、
+          "win-console"を使用できます。
+          これらのオプションを元のコマンドライン・オプションに追加するか、これらのオプションを
+          使用して元のコマンドライン・オプションを上書きして、追加の代替ランチャを作成します。
+          メイン・アプリケーション・ランチャはコマンドライン・オプションから作成されます。
+          このオプションを使用して追加の代替ランチャを作成でき、
+          このオプションを複数回使用して
+          複数の追加のランチャを作成できます。 
+  --arguments <main class arguments>
+          ランチャにコマンド・ライン引数が指定されていない場合にメイン・クラスに渡す
+          コマンド・ライン引数
+          このオプションは複数回使用できます。
+  --java-options <java options>
+          Javaランタイムに渡すオプション
+          このオプションは複数回使用できます。
+  --main-class <class name>
+          実行するアプリケーション・メイン・クラスの修飾名
+          このオプションを使用できるのは、--main-jarが指定されている場合だけです。
+  --main-jar <main jar file>
+          メイン・クラスを含む、アプリケーションのメインJAR
+          (入力パスからの相対パスとして指定)
+          --moduleまたは--main-jarオプションを指定できますが、両方は
+          指定できません。
+  --module -m <module name>[/<main class>]
+          アプリケーションのメイン・モジュール(およびオプションでメイン・クラス)
+          このモジュールは、モジュール・パスに置かれている必要があります。
+          このオプションが指定されている場合、メイン・モジュールは
+          Javaランタイム・イメージ内でリンクされます。--moduleまたは--main-jar
+          オプションを指定できますが、両方は指定できません。
+  --mac-package-identifier <ID string>
+          MacOSのアプリケーションを一意に識別するID
+          メイン・クラス名にデフォルト設定されています。
+          英数字(A-Z、a-z、0-9)、ハイフン(-)
+          およびピリオド(.)文字のみ使用できます。
+  --mac-package-name <name string>
+          メニュー・バーに表示されるアプリケーションの名前
+          アプリケーション名とは異なります。
+          この名前は16文字未満にする必要があり、メニュー・バー
+          およびアプリケーション情報ウィンドウに表示するのに適している必要があります。
+          アプリケーション名にデフォルト設定されています。
+  --mac-package-signing-prefix <prefix string>
+          アプリケーション・パッケージに署名する際、既存のパッケージIDのない
+          署名が必要なすべてのコンポーネントに、
+          この値が接頭辞として付けられます。
+  --mac-sign
+          パッケージに署名するようリクエストします
+  --mac-signing-keychain <file path>
+          署名アイデンティティを検索するキーチェーンのパス
+          (絶対パスまたは現在のディレクトリからの相対パス)。
+          指定しなかった場合、標準のキーチェーンが使用されます。
+  --mac-signing-key-user-name <team name>
+          Apple署名アイデンティティの名前のチーム名部分。
+          例: "Developer ID Application: "
+
+アプリケーション・パッケージを作成するためのオプション:
+  --app-image <file path>
+          インストール可能なパッケージの作成に使用する、事前定義済み
+          アプリケーション・イメージの場所
+          (絶対パスまたは現在のディレクトリからの相対パス)
+  --file-associations <file path>
+          キー、値のペアのリストを含むプロパティ・ファイルへのパス
+          (絶対パスまたは現在のディレクトリからの相対パス)
+          キー"extension"、"mime-type"、"icon"、"description"
+          を使用して関連付けを記述できます。
+          このオプションは複数回使用できます。
+  --install-dir <file path>
+          アプリケーションのインストール・ディレクトリの絶対パス
+  --license-file <file path>
+          ライセンス・ファイルへのパス
+          (絶対パスまたは現在のディレクトリからの相対パス)
+  --resource-dir <path>
+          オーバーライドjpackageリソースへのパス
+          アイコン、テンプレート・ファイルおよびjpackageのその他のリソースは、
+          このディレクトリに置換リソースを追加することでオーバーライドできます。
+          (絶対パスまたは現在のディレクトリからの相対パス)
+  --runtime-image <file-path>
+          インストールする事前定義済みのランタイム・イメージのパス
+          (絶対パスまたは現在のディレクトリからの相対パス)
+          ランタイム・パッケージの作成時には、オプションが必要です。
+
+アプリケーション・パッケージを作成するためのプラットフォーム依存オプション:
+

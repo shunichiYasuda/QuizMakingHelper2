@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.genSci.tools.QuizMakingHelper.PrimaryController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="493.0" prefWidth="778.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.genSci.tools.QuizMakingHelper.PrimaryController">
    <top>
       <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
         <items>
@@ -24,7 +24,7 @@
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
-                  <ToolBar prefHeight="40.0" prefWidth="298.0">
+                  <ToolBar prefHeight="40.0" prefWidth="377.0">
                     <items>
                         <Label text="ソース入力" />
                       <Button mnemonicParsing="false" onAction="#openAction" text="Open..." />
@@ -33,19 +33,19 @@
                         <Button mnemonicParsing="false" onAction="#execAction" text="変換" />
                     </items>
                   </ToolBar>
-                  <TextArea fx:id="srcArea" layoutX="2.0" layoutY="40.0" prefHeight="318.0" prefWidth="294.0" />
+                  <TextArea fx:id="srcArea" layoutX="2.0" layoutY="40.0" prefHeight="410.0" prefWidth="381.0" />
                </children>
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
-                  <ToolBar prefHeight="40.0" prefWidth="299.0">
+                  <ToolBar prefHeight="40.0" prefWidth="374.0">
                     <items>
                         <Label text="出力コード" />
                         <Button mnemonicParsing="false" onAction="#copyToClipboad" text="Copy" />
                       <Button mnemonicParsing="false" onAction="#clearCodeArea" text="Clear" />
                     </items>
                   </ToolBar>
-                  <TextArea fx:id="codeArea" layoutX="-4.0" layoutY="40.0" prefHeight="321.0" prefWidth="301.0" />
+                  <TextArea fx:id="codeArea" layoutX="-4.0" layoutY="40.0" prefHeight="412.0" prefWidth="389.0" />
                </children>
             </AnchorPane>
         </items>
